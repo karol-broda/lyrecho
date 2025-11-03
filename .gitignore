@@ -1,0 +1,27 @@
+lyrecho
+*.so
+*.dylib
+
+# test binary
+*.test
+
+# output of the go coverage tool
+*.out
+
+# go workspace file
+go.work
+
+# dependency directories
+vendor/
+
+# ide
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# os
+.DS_Store
+Thumbs.db
+
