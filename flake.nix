@@ -6,30 +6,55 @@
     systems.url = "github:nix-systems/default";
   };
 
-  outputs = { self, nixpkgs, systems }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      systems,
+    }:
     let
       supportedSystems = import systems;
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
     in
     {
-      overlays.default = final: prev:
+      overlays.default =
+        final: prev:
         let
           version = "1.25.0";
 
           platformInfo = {
-            "x86_64-linux" = { suffix = "linux-amd64"; sri = "sha256-KFKvDLIKExObNEiZLmm4aOUO0Pih5ZQO4d6eGaEjthM="; };
-            "aarch64-linux" = { suffix = "linux-arm64"; sri = "sha256-Bd511plKJ4NpmBXuVTvVqTJ9i3mZHeNuOLZoYngvVK4="; };
-            "i686-linux" = { suffix = "linux-386"; sri = "sha256-jGAt2dmbyUU7OZXSDOS684LMUIVZAKDs5d6ZKd9KmTo="; };
-            "armv6l-linux" = { suffix = "linux-armv6l"; sri = "sha256-paj4GY/PAOHkhbjs757gIHeL8ypAik6Iczcb/ORYzQk="; };
+            "x86_64-linux" = {
+              suffix = "linux-amd64";
+              sri = "sha256-KFKvDLIKExObNEiZLmm4aOUO0Pih5ZQO4d6eGaEjthM=";
+            };
+            "aarch64-linux" = {
+              suffix = "linux-arm64";
+              sri = "sha256-Bd511plKJ4NpmBXuVTvVqTJ9i3mZHeNuOLZoYngvVK4=";
+            };
+            "i686-linux" = {
+              suffix = "linux-386";
+              sri = "sha256-jGAt2dmbyUU7OZXSDOS684LMUIVZAKDs5d6ZKd9KmTo=";
+            };
+            "armv6l-linux" = {
+              suffix = "linux-armv6l";
+              sri = "sha256-paj4GY/PAOHkhbjs757gIHeL8ypAik6Iczcb/ORYzQk=";
+            };
 
-            "x86_64-darwin" = { suffix = "darwin-amd64"; sri = "sha256-W9YOgjA3BiwjB8cegRGAmGURZxTW9rQQWXz1B139gO8="; };
-            "aarch64-darwin" = { suffix = "darwin-arm64"; sri = "sha256-VEkyhEFW2Bcveij3fyrJwVojBGaYtiQ/YzsKCwDAdJw="; };
+            "x86_64-darwin" = {
+              suffix = "darwin-amd64";
+              sri = "sha256-W9YOgjA3BiwjB8cegRGAmGURZxTW9rQQWXz1B139gO8=";
+            };
+            "aarch64-darwin" = {
+              suffix = "darwin-arm64";
+              sri = "sha256-VEkyhEFW2Bcveij3fyrJwVojBGaYtiQ/YzsKCwDAdJw=";
+            };
           };
 
           hostSystem = prev.stdenv.hostPlatform.system;
 
           chosen =
-            if prev.lib.hasAttr hostSystem platformInfo then platformInfo.${hostSystem}
+            if prev.lib.hasAttr hostSystem platformInfo then
+              platformInfo.${hostSystem}
             else
               throw ''
                 unsupported system: ${hostSystem}
@@ -70,19 +95,35 @@
           };
         };
 
-      packages = forAllSystems (system:
-        let pkgs = import nixpkgs { inherit system; overlays = [ self.overlays.default ]; };
-        in {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.default ];
+          };
+        in
+        {
           default = pkgs.go_1_25_bin;
           go_1_25_bin = pkgs.go_1_25_bin;
         }
       );
 
-      devShells = forAllSystems (system:
-        let pkgs = import nixpkgs { inherit system; overlays = [ self.overlays.default ]; };
-        in {
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.default ];
+          };
+        in
+        {
           default = pkgs.mkShell {
-            packages = [ pkgs.go_1_25_bin pkgs.git ];
+            packages = [
+              pkgs.go_1_25_bin
+              pkgs.git
+              pkgs.gopls
+            ];
 
             GOTOOLCHAIN = "local";
 

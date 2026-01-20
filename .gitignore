@@ -1,4 +1,3 @@
-lyrecho
 *.so
 *.dylib
 
@@ -24,4 +23,3 @@ vendor/
 # os
 .DS_Store
 Thumbs.db
-
